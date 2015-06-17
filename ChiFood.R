@@ -8,7 +8,7 @@ library(shiny)
 library(jsonlite)
 
 ##Data Processing
-data <- read.csv("C:/Users/John E Sukup III/Downloads/Food_Inspections.csv", header = TRUE, stringsAsFactors = FALSE)# Read in data
+data <- read.csv("C:/Users/sukujo01/Downloads/Food_Inspections.csv", header = TRUE, stringsAsFactors = FALSE)# Read in data
 
 names(data) <- tolower(names(data))# Lower case varnames
 data$inspection.date <- parse_date_time(data$inspection.date, "mdy")# Convert to POSIX date variable
@@ -47,6 +47,6 @@ geojson <- readLines("https://raw.githubusercontent.com/smartchicago/chicago-atl
 map <- leaflet() %>% 
     addTiles() %>% 
     addGeoJSON(geojson) %>%
-    setMaxBounds(-87.9353, 42.0003, -87.5171, 41.6746) %>% 
-    setView(-87, 42, zoom = 11)
+    fitBounds(-87.9353, 42.0003, -87.5171, 41.6746) %>% 
+    setView(-87.7, 41.85, zoom = 11)
 
