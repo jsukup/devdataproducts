@@ -7,9 +7,8 @@ library(dplyr)
 library(shiny)
 library(jsonlite)
 
-##Data Processing
+## Data Processing
 data <- read.csv("C:/Users/John E Sukup III/Downloads/Food_Inspections.csv", header = TRUE, stringsAsFactors = FALSE)# Read in data
-
 names(data) <- tolower(names(data))# Lower case varnames
 data$inspection.date <- parse_date_time(data$inspection.date, "mdy")# Convert to POSIX date variable
 data$facility.type <- as.factor(data$facility.type)# Convert to factor
@@ -39,40 +38,28 @@ data$facility.type <- tolower(data$facility.type)# Drop case of facility type na
 data$facility.type <- gsub("^rest.*$", "restaurant", data$facility.type)# Rename all restaurant facility types to "restaurant"
 data$dba.name <- toupper(data$dba.name)# Capitalize all business names for cleaner popups
 data <- filter(data, facility.type == "restaurant")# Filter for restaurant-only data frame
+data <- select(data, c(dba.name,latitude,longitude,risk,zip))
+save(data, file = "data.RData")
 
-##Shiny widget
-zip <- filter(data, zip == "60827") %>% # Zip code filter
-
-#Leaflet map
-color <- colorFactor("RdYlGn", domain = zip$risk)
+## Shiny widget
+data <- load(file = "data.RData")# Load RData
+# Zip code filter
+zip <- filter(data, zip == "60618") %>% 
+    group_by(dba.name, latitude, longitude) %>% 
+    summarise(risk = round(mean(as.integer(risk))))
+color <- colorFactor(c("red","yellow","green"), domain = zip$risk)# Create color palette
+# Leaflet map
 map <- leaflet(zip) %>% 
     addProviderTiles("Stamen.Toner") %>% 
-    addCircleMarkers(lat = ~latitude, lng = ~longitude, popup = ~dba.name, color = ~color(risk), fillOpacity = .5) %>% 
-    mapOptions(zoomToLimits = "always")
-
-    
-    
-    
-    
-    
-
-
-
-
-
-
-# zips <- data %>% 
-#        group_by(as.character(zip)) %>%
-#        summarise(mean(as.numeric(risk)))
-# names(zips) <- c("region","value")
-# 
-# geojson <- readLines("https://raw.githubusercontent.com/smartchicago/chicago-atlas/master/db/import/zipcodes.geojson", warn = FALSE) %>%
-#     paste(collapse = "\n") %>%
-#     fromJSON(simplifyVector = FALSE)
-# 
-# map <- leaflet() %>% 
-#     addTiles() %>% 
-#     addGeoJSON(geojson) %>%
-#     fitBounds(-87.9353, 42.0003, -87.5171, 41.6746) %>% 
-#     setView(-87.7, 41.85, zoom = 11)
-
+    addCircleMarkers(lat = ~latitude, 
+                     lng = ~longitude, 
+                     popup = ~dba.name, 
+                     color = ~color(risk), 
+                     fillOpacity = .3) %>% 
+    mapOptions(zoomToLimits = "always") %>% 
+    addLegend("topright", 
+              color = c("red","yellow","green"), 
+              labels = c("High Risk","Medium Risk","Low Risk"), 
+              values = ~risk,
+              title = "Risk Level for Chicago Restaurants",
+              opacity = .7)
