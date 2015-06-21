@@ -18,11 +18,12 @@ data <- data %>%
 ## Zip code filter
 ui <- fluidPage(
     leafletOutput("chimap"),
-    selectInput("zipcodes", "Select Zip Code", choices = sort(data$zip), selected = "60601")
+    selectInput("zipcodes", "Select Zip Code", choices = sort(data$zip))
 )
 
 server <- function(input, output){
     data <- data
+    color <- colorFactor(c("red","yellow","green"), domain = data$risk)
     getData <- reactive({data[data$zip == input$zipcodes,]})
     
     output$chimap <- renderLeaflet({
@@ -31,7 +32,7 @@ server <- function(input, output){
         addCircleMarkers(lat = ~latitude, 
                          lng = ~longitude, 
                          popup = ~dba.name, 
- # Create color palette
+                         color = ~color(risk), # Create color palette
                          fillOpacity = .3) %>% 
         mapOptions(zoomToLimits = "always") %>% 
         addLegend("topright",
@@ -45,3 +46,4 @@ server <- function(input, output){
 }
   
 shinyApp(ui, server)        
+
