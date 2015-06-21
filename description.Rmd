@@ -63,6 +63,7 @@ save(data, file = "data.RData")
     (more on data set can be found at [here](https://data.cityofchicago.org/api/assets/BAD5301B-681A-4202-9D25-51B2CAE672FF))
 3.  Markets can be clicked on to see restaurant name
 4.  Color of marker indicates level of risk associated with restaurant (see legend)
+5.  You can soom in using the "+/-" togggle on the upper left or by using your scroll wheel to get a closer view when markers overlap.
 
 ###Limitations
 1.  Some latitude/longitude combinations for different restaurants are the same in the data set. This allows two or more locations to overlap and markers to "blend" colors.
