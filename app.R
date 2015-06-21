@@ -17,8 +17,16 @@ data <- data %>%
 # Leaflet map
 ## Zip code filter
 ui <- fluidPage(
-    leafletOutput("chimap"),
-    selectInput("zipcodes", "Select Zip Code", choices = sort(data$zip))
+    titlePanel("Chicago Food Inspections: Restaurant Risk Level - 2001 to Present"),
+    mainPanel(
+        tabsetPanel(
+            tabPanel("App", leafletOutput("chimap"),
+                     selectInput("zipcodes", 
+                                 "Select Zip Code", 
+                                 choices = sort(data$zip))),
+            tabPanel("Description", includeMarkdown("description.md"))
+    )
+)
 )
 
 server <- function(input, output){
