@@ -39,7 +39,8 @@ server <- function(input, output){
         addProviderTiles("Stamen.Toner") %>% 
         addCircleMarkers(lat = ~latitude, 
                          lng = ~longitude, 
-                         popup = ~dba.name, 
+                         popup = ~dba.name,
+                         radius = 5,
                          color = ~color(risk), # Create color palette
                          fillOpacity = .3) %>% 
         mapOptions(zoomToLimits = "always") %>% 
